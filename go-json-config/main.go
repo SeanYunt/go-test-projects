@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 type Config struct {
@@ -30,5 +31,8 @@ func LoadConfiguration(filename string) (Config, error) {
 func main() {
 	fmt.Println("Starting the Application...")
 	config, _ := LoadConfiguration("config.json")
-	fmt.Println(config.Database)
+	fmt.Println(config.Database.Host)
+
+	out := fmt.Sprintf("%s:%s", config.Database.Host, strconv.Itoa(config.Database.Port))
+	fmt.Println(out)
 }

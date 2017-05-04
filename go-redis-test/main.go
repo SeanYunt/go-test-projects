@@ -9,6 +9,7 @@ import (
 	"github.com/go-redis/redis"
 )
 
+// struct to hold the values from the config.json.
 type Config struct {
 	Database struct {
 		Host string `json:"host"`
@@ -18,6 +19,7 @@ type Config struct {
 	Port int    `json:"port"`
 }
 
+// get the config.json file to read in the value to the struct.
 func LoadConfiguration(filename string) (Config, error) {
 	var config Config
 	configFile, err := os.Open(filename)
@@ -33,14 +35,12 @@ func LoadConfiguration(filename string) (Config, error) {
 func main() {
 	fmt.Println("Starting the Application...")
 	config, _ := LoadConfiguration("config.json")
-	fmt.Println(config.Database)
-	out := fmt.Sprintf("%s:%s", config.Database.Host, strconv.Itoa(config.Database.Port))
-	fmt.Println(out)
+	//fmt.Println(config.Database)
+	//out := fmt.Sprintf("%s:%s", config.Database.Host, strconv.Itoa(config.Database.Port))
+	//fmt.Println(out)
 
 	client := redis.NewClient(&redis.Options{
-		Addr: fmt.Sprintf("%s:%s", config.Database.Host, strconv.Itoa(config.Database.Port)),
-		//Addr: out,
-		//Addr:     "localhost:6379",
+		Addr:     fmt.Sprintf("%s:%s", config.Database.Host, strconv.Itoa(config.Database.Port)),
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
@@ -55,10 +55,13 @@ func main() {
 		panic(err1)
 	}
 	val, err := client.Get("key").Result()
-	if err != nil {
+	if err == redis.Nil {
+		fmt.Println("key does not exists")
+	} else if err != nil {
 		panic(err)
+	} else {
+		fmt.Println("key is", val)
 	}
-	fmt.Println("key", val)
 
 	val2, err2 := client.Get("key2").Result()
 	if err2 == redis.Nil {
