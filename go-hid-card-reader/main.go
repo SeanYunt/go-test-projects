@@ -39,6 +39,11 @@ func open(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, nil)
 }
 
+func thanks(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("thankyou.html")
+	t.Execute(w, nil)
+}
+
 func addhours(w http.ResponseWriter, r *http.Request) {
 	config, _ := LoadConfiguration("config.json")
 	f, err := os.OpenFile(config.DataFileLoc, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
@@ -61,7 +66,7 @@ func addhours(w http.ResponseWriter, r *http.Request) {
 
 	f.Write(b)
 	f.Close()
-	http.Redirect(w, r, "/", http.StatusFound)
+	http.Redirect(w, r, "/thankyou.html", http.StatusFound)
 }
 
 func main() {
@@ -70,5 +75,6 @@ func main() {
 	fmt.Println(config.DataFileLoc)
 	http.HandleFunc("/addhours", addhours)
 	http.HandleFunc("/", open)
+	http.HandleFunc("/thankyou.html", thanks)
 	http.ListenAndServe(":8080", nil)
 }
