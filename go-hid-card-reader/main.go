@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"time"
 )
 
 type Config struct {
@@ -18,8 +19,7 @@ type WorkRecord struct { //define the structure for the work hour.
 	WorkTypeOther    string
 	HoursWorked      string
 	PictureLoc       string
-	/* I need to figure out how to convert date time for json. this is a little more involved.
-	DTS              time.Time */
+	DateOfWork       string
 }
 
 func LoadConfiguration(filename string) (Config, error) {
@@ -52,7 +52,7 @@ func addhours(w http.ResponseWriter, r *http.Request) {
 	wr.MemberCardNumber = r.FormValue("membercardnumber")
 	wr.WorkType = r.FormValue("worktype")
 	wr.HoursWorked = r.FormValue("hoursworked")
-
+	wr.DateOfWork = time.Now().Format(time.RFC850)
 	b, err := json.Marshal(wr)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -61,6 +61,7 @@ func addhours(w http.ResponseWriter, r *http.Request) {
 
 	f.Write(b)
 	f.Close()
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func main() {
